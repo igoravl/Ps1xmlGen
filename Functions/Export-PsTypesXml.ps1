@@ -73,18 +73,7 @@ Function Export-Xml
 
                         foreach($settingName in (([PSCustomObject]$property) | Get-Member -MemberType NoteProperty | Where-Object Name -ne Name).Name)
                         {
-                            $settingValue = $property.$settingName
-
-                            if($settingValue.IndexOf("`n") -gt 0)
-                            {
-                                $writer.WriteStartElement($settingName)
-                                $writer.WriteCData($settingValue)
-                                $writer.WriteEndElement()
-                            }
-                            else
-                            {
-                                $writer.WriteElementString($settingName, $settingValue)
-                            }
+                            $writer.WriteElementString($settingName, $property.$settingName)
                         }
                     }
 
