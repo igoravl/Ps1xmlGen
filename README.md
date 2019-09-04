@@ -1,3 +1,3 @@
-# PsTypesGen
+# Ps1xmlGen
 
-Generates &lt;module&gt;.types.ps1xml from YAML files
+Generates ps1xml files (Format and Types) from YAML files
