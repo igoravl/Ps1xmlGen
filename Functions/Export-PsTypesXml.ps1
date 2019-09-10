@@ -1,4 +1,4 @@
-Function Export-Xml
+Function Export-PsTypesXml
 {
     [CmdletBinding(SupportsShouldProcess=$true)]
     Param

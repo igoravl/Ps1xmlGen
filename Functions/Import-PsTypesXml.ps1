@@ -1,4 +1,4 @@
-Function Import-Xml
+Function Import-PsTypesXml
 {
     [CmdletBinding(SupportsShouldProcess=$true)]
     Param
