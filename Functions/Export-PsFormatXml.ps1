@@ -67,12 +67,6 @@ Function Export-PsFormatXml
             {
                 $itemName = $formatFile.BaseName.Substring(0, $formatFile.BaseName.Length - $fileType.Length - 1)
             }
-            
-            if(-not (Test-Path "function:$exporter"))
-            {
-                Write-Warning "Unknown file type '$fileType' found while processing '$($formatFile.FullName)'. Ignoring."
-                continue
-            }
 
             _Export $xmlDocument $yml $itemName $fileType
         }
@@ -85,6 +79,14 @@ Function Export-PsFormatXml
 
 Function _Export([xml]$doc, $yml, $itemName, $itemType)
 {
+    $exporter = "_Export$itemType"
+
+    if(-not (Test-Path "function:$exporter"))
+    {
+        Write-Warning "Unknown file type '$fileType' found while processing '$($formatFile.FullName)'. Ignoring."
+        continue
+    }
+
     $rootNodeName = _GetRootNodeName $itemType
 
     $rootNode = $doc.DocumentElement.SelectSingleNode($rootNodeName)
@@ -104,8 +106,6 @@ Function _Export([xml]$doc, $yml, $itemName, $itemType)
 
         return
     }
-
-    $exporter = "_Export$itemType"
 
     & $exporter $doc $yml $itemName $rootNode
 }
