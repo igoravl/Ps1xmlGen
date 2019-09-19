@@ -57,9 +57,17 @@ Function Export-PsFormatXml
 
             $yml = (Get-Content $formatFile.FullName -Encoding $InputEncoding -Raw | ConvertFrom-Yaml -Ordered)
 
-            $fileType = $formatFile.BaseName.Split('.')[-1]
-            $itemName = $formatFile.BaseName.Substring(0, $formatFile.BaseName.Length - $fileType.Length - 1)
+            $fileType = $formatFile.Name.Split('.')[-2]
 
+            if($fileType -eq $formatFile.BaseName)
+            {
+                $itemName = $fileType
+            }
+            else
+            {
+                $itemName = $formatFile.BaseName.Substring(0, $formatFile.BaseName.Length - $fileType.Length - 1)
+            }
+            
             if(-not (Test-Path "function:$exporter"))
             {
                 Write-Warning "Unknown file type '$fileType' found while processing '$($formatFile.FullName)'. Ignoring."
