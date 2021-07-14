@@ -51,7 +51,7 @@ Function Export-PsFormatXml
 
         $xmlDocument = [xml] '<Configuration/>'
 
-        foreach($formatFile in (Get-ChildItem $InputDirectory -File -Recurse))
+        foreach($formatFile in (Get-ChildItem $InputDirectory -File -Recurse -Include *.yml))
         {
             Write-Verbose "Exporting file $formatFile"
 
@@ -153,9 +153,59 @@ Function _ExportView_TableControl([xml]$doc, $data, $rootNode)
 {
     $tableControlElem = $rootNode.AppendChild($doc.CreateElement('TableControl'))
     $headersElem = $tableControlElem.AppendChild($doc.CreateElement('TableHeaders'))
-    $rowsElem = $tableControlElem.AppendChild($doc.CreateElement('TableRowEntries')). `
+    $rowsElem = $tableControlElem.AppendChild($doc.CreateElement('TableRowEntries'))
+    
+    if($data -is [hashtable])
+    {
+        # Single TableRowEntry
+        _ExportView_TableRowEntry $doc $data $rowsElem
+    }
+    else
+    {
+        # Multiple TableRowEntry elements
+        foreach($entry in $data)
+        {
+            _ExportView_TableRowEntry $doc $entry $rowsElem
+        }
+    }
+}
+
+Function _ExportView_TableRowEntry([xml]$doc, $data, $rootNode)
+{
+    $row = $rootNode. `
         AppendChild($doc.CreateElement('TableRowEntry')). `
         AppendChild($doc.CreateElement('TableColumnItems'))
+    $headersElem = $rootNode.ParentNode.SelectSingleNode('TableHeaders')
+
+    # Prepare data object to deal with different syntaxes
+
+    $parsedData = @{
+        Columns = @{}
+        EntrySelectedBy = @{}
+        Wrap = $false
+    }
+
+    foreach($propName in $data.Keys)
+    {
+        switch($propName)
+        {
+            {$_ -in @('TableColumnItems', 'Columns')} {
+
+            }
+
+            'EntrySelectedBy' {
+            }
+
+            'Wrap' {
+                $parsedData.Wrap = [bool]::Parse($data[$propName])
+            }
+        }
+        if($key -notin @())
+        {
+            $simpleMode = $true
+            break
+        }
+    }
 
     foreach($col in $data.Keys)
     {
